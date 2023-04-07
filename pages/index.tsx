@@ -144,7 +144,7 @@ export default function Home({dataJson}) {
 
 export async function getServerSideProps() {
   // Fetch data from external API
-  const res = await fetch(`http://back:8000`)
+  const res = await fetch(`http://back:8000/get_all_keys`)
   const dataJson = await res.json()
 
   // Pass data to the page via props
