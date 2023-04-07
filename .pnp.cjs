@@ -32,6 +32,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:18.15.11"],\
             ["@types/react", "npm:18.0.33"],\
             ["autoprefixer", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:10.4.14"],\
+            ["electron-to-chromium", "npm:1.4.356"],\
             ["next", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:13.3.0"],\
             ["postcss", "npm:8.4.21"],\
             ["react", "npm:18.2.0"],\
@@ -457,7 +458,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["browserslist", "npm:4.21.5"],\
             ["caniuse-lite", "npm:1.0.30001474"],\
-            ["electron-to-chromium", "npm:1.4.355"],\
+            ["electron-to-chromium", "npm:1.4.356"],\
             ["node-releases", "npm:2.0.10"],\
             ["update-browserslist-db", "virtual:e3b9e9d029ed690d72cbb29196ba0a23f15b398eeb926347678187be937db870a04cbf984eecc8e0ec9c290158a9cd8607d12f0188665abe039fa4a9051a22ac#npm:1.0.10"]\
           ],\
@@ -686,10 +687,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["electron-to-chromium", [\
-        ["npm:1.4.355", {\
-          "packageLocation": "./.yarn/cache/electron-to-chromium-npm-1.4.355-dee51e090d-b3fb9df336.zip/node_modules/electron-to-chromium/",\
+        ["npm:1.4.356", {\
+          "packageLocation": "./.yarn/cache/electron-to-chromium-npm-1.4.356-ffc762122f-5a61003c57.zip/node_modules/electron-to-chromium/",\
           "packageDependencies": [\
-            ["electron-to-chromium", "npm:1.4.355"]\
+            ["electron-to-chromium", "npm:1.4.356"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -1903,6 +1904,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:18.15.11"],\
             ["@types/react", "npm:18.0.33"],\
             ["autoprefixer", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:10.4.14"],\
+            ["electron-to-chromium", "npm:1.4.356"],\
             ["next", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:13.3.0"],\
             ["postcss", "npm:8.4.21"],\
             ["react", "npm:18.2.0"],\
