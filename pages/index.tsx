@@ -11,7 +11,8 @@ export default function Home() {
   const { data, error } = useSWR('/api/staticData', fetcher);
 
   const toggleEdit = (event, key, fieldValue) => {
-    const spanElement = event.target;
+    const spanElement = event.currentTarget;
+    console.log(event.currentTarget);
     const textareaElement = document.createElement('textarea');
     textareaElement.setAttribute('data-prev-value', fieldValue);
     textareaElement.setAttribute('name', key);
@@ -38,7 +39,8 @@ export default function Home() {
     );
 
     textareaElement.addEventListener('blur', () => {
-      const newSpanElement = document.createElement('span');
+      const newSpanElement = document.createElement('p');
+      // XSS!!!!!!!!!!!
       newSpanElement.innerHTML = textareaElement.value;
       newSpanElement.classList.add('text-sm', 'text-gray-500');
       newSpanElement.addEventListener('click', (e) => toggleEdit(e, key, fieldValue));
@@ -47,11 +49,9 @@ export default function Home() {
     });
 
     spanElement.replaceWith(textareaElement);
+    textareaElement.style.height = 'auto';
+    textareaElement.style.height = textareaElement.scrollHeight + 'px';
     textareaElement.focus();
-  };
-  const resizeTextarea = (element) => {
-    element.style.height = 'auto';
-    element.style.height = element.scrollHeight + 'px';
   };
 
   useEffect(() => {
@@ -86,7 +86,6 @@ export default function Home() {
     const newValue = inputElement.value;
 
     if (newValue !== oldValue) {
-      resizeTextarea(inputElement); // Call the resizeTextarea function
       inputElement.setAttribute('data-prev-value', newValue);
     }
   };
@@ -133,9 +132,9 @@ export default function Home() {
                       </td>
                       <td className="p-4 text-sm text-gray-500">
                         <label htmlFor="email" className="sr-only"></label>
-                        <span className="text-sm text-gray-500" onClick={(e) => toggleEdit(e, key, fieldValue)}>
-              {fieldValue}
-            </span>
+                        <p className="text-sm text-gray-500" onClick={(e) => toggleEdit(e, key, fieldValue)}>
+                        {fieldValue}
+                      </p>
                       </td>
                     </tr>
                 ))}
