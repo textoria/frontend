@@ -5,7 +5,7 @@ interface JsonData {
   [key: string]: string
 }
 
-export default function Home({data}) {
+export default function Home({dataJson}) {
   console.log("here");
   const toggleEdit = (event, key, fieldValue) => {
     const spanElement = event.currentTarget;
@@ -68,13 +68,11 @@ export default function Home({data}) {
         parentElement.removeEventListener('input', handleInputChange);
       }
     };
-  }, [data]);
+  }, [dataJson]);
 
   // if (error) return <div>Failed to load</div>;
   //
   // if (!data) return <div>Loading...</div>;
-
-  const dataJson: JsonData  = JSON.parse(data);
 
   const handleInputChange = (event) => {
     const inputElement = event.target;
@@ -147,8 +145,8 @@ export default function Home({data}) {
 export async function getServerSideProps() {
   // Fetch data from external API
   const res = await fetch(`http://back:8000`)
-  const data = await res.json()
+  const dataJson = await res.json()
 
   // Pass data to the page via props
-  return { props: { data } }
+  return { props: { dataJson } }
 }
