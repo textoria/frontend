@@ -1,18 +1,14 @@
 import useSWR from 'swr';
 import { useEffect } from 'react';
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
-
 interface JsonData {
   [key: string]: string
 }
 
-export default function Home() {
-  const { data, error } = useSWR('/api/staticData', fetcher);
-
+export default function Home({data}) {
+  console.log("here");
   const toggleEdit = (event, key, fieldValue) => {
     const spanElement = event.currentTarget;
-    console.log(event.currentTarget);
     const textareaElement = document.createElement('textarea');
     textareaElement.setAttribute('data-prev-value', fieldValue);
     textareaElement.setAttribute('name', key);
@@ -55,8 +51,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (error) return;
-    if (!data) return;
+    // if (error) return;
+    // if (!data) return;
     const parentElement = document.getElementById('input-container');
 
     if (parentElement) {
@@ -74,9 +70,9 @@ export default function Home() {
     };
   }, [data]);
 
-  if (error) return <div>Failed to load</div>;
-
-  if (!data) return <div>Loading...</div>;
+  // if (error) return <div>Failed to load</div>;
+  //
+  // if (!data) return <div>Loading...</div>;
 
   const dataJson: JsonData  = JSON.parse(data);
 
@@ -145,4 +141,14 @@ export default function Home() {
         </div>
       </div>
   );
+}
+
+
+export async function getServerSideProps() {
+  // Fetch data from external API
+  const res = await fetch(`http://back:8000`)
+  const data = await res.json()
+
+  // Pass data to the page via props
+  return { props: { data } }
 }
