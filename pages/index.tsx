@@ -23,7 +23,7 @@ export default function Home() {
 
     if (parentElement) {
       parentElement.addEventListener('input', (event) => {
-        if (event.target.classList.contains('tracked-input')) {
+        if ((event.target as HTMLElement).classList.contains('tracked-input')) {
           handleInputChange(event);
         }
       });
