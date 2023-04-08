@@ -10,6 +10,7 @@ interface JsonData {
 }
 
 export default function Home({dataJson}) {
+
   const toggleEdit = (event, key, fieldValue) => {
     const spanElement = event.currentTarget;
     const textareaElement = document.createElement('textarea');
@@ -41,7 +42,7 @@ export default function Home({dataJson}) {
       const newSpanElement = document.createElement('p');
       newSpanElement.innerText = textareaElement.value;
       newSpanElement.classList.add('text-sm', 'text-gray-500');
-      newSpanElement.addEventListener('click', (e) => toggleEdit(e, key, fieldValue));
+      newSpanElement.addEventListener('click', (e) => toggleEdit(e, key, textareaElement.value));
       textareaElement.replaceWith(newSpanElement);
       handleInputChange({ target: textareaElement });
     });
@@ -70,10 +71,6 @@ export default function Home({dataJson}) {
     };
   }, [dataJson]);
 
-  // if (error) return <div>Failed to load</div>;
-  //
-  // if (!data) return <div>Loading...</div>;
-
   const handleInputChange = async (event) => {
     const inputElement = event.target;
     const oldValue = inputElement.getAttribute('data-prev-value'); // Get the previous value
@@ -81,12 +78,24 @@ export default function Home({dataJson}) {
 
     if (newValue !== oldValue) {
       inputElement.setAttribute('data-prev-value', newValue);
-      const res = await fetch(`api/update?key=${inputElement.id}&new_value=${newValue}`, {
+      console.log(`api/update?key=${inputElement.id}&new_value=${encodeURIComponent(newValue)}`);
+      const res = await fetch(`api/update?key=${inputElement.id}&new_value=${encodeURIComponent(newValue)}`, {
         method: 'PUT',
         headers:{
           'Content-Type':'application/json'
-        },
-      });
+        }
+      }).then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Something went wrong');
+      })
+          .then((responseJson) => {
+            // Do something with the response
+          })
+          .catch((error) => {
+            console.log(error)
+          });
     }
   };
 
