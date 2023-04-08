@@ -1,3 +1,5 @@
+const API_BASE_URL = process.env.API_BASE_URL || 'http://back:8000';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
@@ -6,9 +8,13 @@ const nextConfig = {
         return [
             {
                 source: "/api/update",
-                destination: "http://back:8000/update_key"
+                destination: `${API_BASE_URL}/update_key`
             }
         ];
-    }
+    },
+    publicRuntimeConfig: {
+        API_BASE_URL,
+    },
 };
+
 module.exports = nextConfig;

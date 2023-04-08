@@ -1,4 +1,9 @@
 import { useEffect } from 'react';
+import getConfig from 'next/config';
+
+
+const { publicRuntimeConfig } = getConfig();
+const API_BASE_URL = publicRuntimeConfig.API_BASE_URL;
 
 interface JsonData {
   [key: string]: string
@@ -144,7 +149,7 @@ export default function Home({dataJson}) {
 
 export async function getServerSideProps() {
   // Fetch data from external API
-  const res = await fetch(`http://back:8000/get_all_keys`);
+  const res = await fetch(`${API_BASE_URL}/get_all_keys`);
   const dataJson = await res.json();
 
   // Pass data to the page via props
