@@ -13,9 +13,6 @@
     "react-dom": "18.2.0",
     "swr": "^2.1.2"
   },
-  "installConfig": {
-    "pnp": true
-  },
   "packageManager": "yarn@3.5.0",
   "devDependencies": {
     "@types/node": "18.15.11",

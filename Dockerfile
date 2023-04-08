@@ -2,10 +2,12 @@ FROM node:18
 
 WORKDIR /app
 
-COPY . ./
+COPY . .
 
 RUN yarn set version berry
 
-RUN yarn
+RUN yarn install
+
+EXPOSE 3000
 
 CMD ["yarn", "next", "dev"]

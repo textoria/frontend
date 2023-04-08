@@ -1,4 +1,3 @@
-import useSWR from 'swr';
 import { useEffect } from 'react';
 
 interface JsonData {
@@ -6,7 +5,6 @@ interface JsonData {
 }
 
 export default function Home({dataJson}) {
-  console.log("here");
   const toggleEdit = (event, key, fieldValue) => {
     const spanElement = event.currentTarget;
     const textareaElement = document.createElement('textarea');
@@ -50,8 +48,6 @@ export default function Home({dataJson}) {
   };
 
   useEffect(() => {
-    // if (error) return;
-    // if (!data) return;
     const parentElement = document.getElementById('input-container');
 
     if (parentElement) {
@@ -73,13 +69,19 @@ export default function Home({dataJson}) {
   //
   // if (!data) return <div>Loading...</div>;
 
-  const handleInputChange = (event) => {
+  const handleInputChange = async (event) => {
     const inputElement = event.target;
     const oldValue = inputElement.getAttribute('data-prev-value'); // Get the previous value
     const newValue = inputElement.value;
 
     if (newValue !== oldValue) {
       inputElement.setAttribute('data-prev-value', newValue);
+      const res = await fetch(`api/update?key=${inputElement.id}&new_value=${newValue}`, {
+        method: 'PUT',
+        headers:{
+          'Content-Type':'application/json'
+        },
+      });
     }
   };
 
@@ -142,8 +144,8 @@ export default function Home({dataJson}) {
 
 export async function getServerSideProps() {
   // Fetch data from external API
-  const res = await fetch(`http://localhost:8000/get_all_keys`)
-  const dataJson = await res.json()
+  const res = await fetch(`http://back:8000/get_all_keys`);
+  const dataJson = await res.json();
 
   // Pass data to the page via props
   return { props: { dataJson } }

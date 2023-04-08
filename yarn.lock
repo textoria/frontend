@@ -47,9 +47,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/swc-linux-x64-gnu@npm:13.3.0":
+"@next/swc-linux-x64-gnu@npm:13.3.0, @next/swc-linux-x64-gnu@npm:^13.3.0":
   version: 13.3.0
   resolution: "@next/swc-linux-x64-gnu@npm:13.3.0"
+  checksum: 82bd6a03f15bcd79c51dca07d85e1fb5a5eebd6c80998b219c3ba29be2e63bebfdf57ccb170c3e91f71823b4184c993571eae24f277354de0cbaae809f0ddcf3
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
@@ -1582,6 +1583,7 @@ next@latest:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
+    "@next/swc-linux-x64-gnu": ^13.3.0
     "@tailwindcss/forms": ^0.5.3
     "@types/node": 18.15.11
     "@types/react": 18.0.33
