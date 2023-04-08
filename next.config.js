@@ -7,14 +7,27 @@ const nextConfig = {
     async rewrites() {
         return [
             {
-                source: "/api/update",
+                source: "/api/update_key",
                 destination: `${API_BASE_URL}/update_key`
+            },
+            {
+                source: "/api/create_key",
+                destination: `${API_BASE_URL}/create_key`
+            },
+            {
+                source: "/api/delete_key",
+                destination: `${API_BASE_URL}/delete_key`
+            },
+            {
+                source: "/api/get_all_keys",
+                destination: `${API_BASE_URL}/get_all_keys`
             }
         ];
     },
     publicRuntimeConfig: {
-        API_BASE_URL,
-    },
+        API_BASE_URL
+    }
 };
 
 module.exports = nextConfig;
+
