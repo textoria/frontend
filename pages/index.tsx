@@ -116,7 +116,7 @@ export default function Home({dataJson}) {
   };
 
   return (
-      <div className="px-4 sm:px-6 lg:px-8">
+      <div className="px-4 sm:px-6 lg:px-8 sm:pt-6">
           <div className="sm:flex sm:items-center">
             <div className="sm:flex-auto">
               <p className="mt-2 text-sm text-gray-700">
@@ -128,7 +128,7 @@ export default function Home({dataJson}) {
                   className="bg-indigo-600 text-white font-bold py-2 px-4 rounded"
                   onClick={() => setIsModalOpen(true)}
               >
-                add
+                Add key
               </button>
               <Modal isOpen={isModalOpen} closeModal={closeModal} addData={addData} />
             </div>
