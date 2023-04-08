@@ -36,8 +36,7 @@ export default function Home({dataJson}) {
 
     textareaElement.addEventListener('blur', () => {
       const newSpanElement = document.createElement('p');
-      // XSS!!!!!!!!!!!
-      newSpanElement.innerHTML = textareaElement.value;
+      newSpanElement.innerText = textareaElement.value;
       newSpanElement.classList.add('text-sm', 'text-gray-500');
       newSpanElement.addEventListener('click', (e) => toggleEdit(e, key, fieldValue));
       textareaElement.replaceWith(newSpanElement);
@@ -125,7 +124,6 @@ export default function Home({dataJson}) {
                         {key}
                       </td>
                       <td className="p-4 text-sm text-gray-500">
-                        <label htmlFor="email" className="sr-only"></label>
                         <p className="text-sm text-gray-500" onClick={(e) => toggleEdit(e, key, fieldValue)}>
                         {fieldValue}
                       </p>
@@ -144,7 +142,7 @@ export default function Home({dataJson}) {
 
 export async function getServerSideProps() {
   // Fetch data from external API
-  const res = await fetch(`http://back:8000/get_all_keys`)
+  const res = await fetch(`http://localhost:8000/get_all_keys`)
   const dataJson = await res.json()
 
   // Pass data to the page via props
