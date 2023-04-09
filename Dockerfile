@@ -1,13 +1,21 @@
-FROM node:18
+FROM node:alpine
 
-WORKDIR /app
+RUN mkdir -p /usr/src/app
+ENV PORT 3000
 
-COPY . .
+WORKDIR /usr/src/app
+
+COPY package.json /usr/src/app
+COPY yarn.lock /usr/src/app
+
+# Production use node instead of root
+# USER node
 
 RUN yarn set version berry
 
 RUN yarn install
 
-EXPOSE 3000
+COPY . /usr/src/app
 
-CMD ["yarn", "next", "dev"]
+EXPOSE 3000
+CMD [ "yarn", "dev" ]
