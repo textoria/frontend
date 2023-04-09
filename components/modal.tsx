@@ -88,5 +88,4 @@ const Modal = ({ isOpen, closeModal, addData }) => {
     );
 };
 
-export default Modal;
-
+export default Modal

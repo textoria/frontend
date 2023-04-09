@@ -1,6 +1,6 @@
 import getConfig from 'next/config';
 import {useEffect, useState} from "react";
-import Modal from '../components/Modal';
+import Modal from '../components/modal';
 import RemoveModal from "../components/removeModal";
 
 const { publicRuntimeConfig } = getConfig();
