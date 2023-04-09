@@ -31,13 +31,10 @@ npm-debug.log*
 .env.test.local
 .env.production.local
 
-yarn-debug.log*
-yarn-error.log*
-.yarn/*
-!.yarn/releases
-!.yarn/plugins
 .pnp.*
-!.yarn/cache
+.yarn/*
 !.yarn/patches
+!.yarn/plugins
+!.yarn/releases
 !.yarn/sdks
 !.yarn/versions
