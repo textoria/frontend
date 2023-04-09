@@ -1,15 +1,10 @@
-FROM node:alpine
+FROM node:19
 
-RUN mkdir -p /usr/src/app
 ENV PORT 3000
 
 WORKDIR /usr/src/app
 
-COPY package.json /usr/src/app
-COPY yarn.lock /usr/src/app
-
-# Production use node instead of root
-# USER node
+COPY package.json yarn.lock ./
 
 RUN yarn set version berry
 
