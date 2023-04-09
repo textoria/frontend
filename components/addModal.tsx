@@ -3,40 +3,55 @@ import React, { useState } from 'react';
 interface ModalProps {
     isOpen: boolean;
     closeModal: () => void;
-    addData: () => void;
+    syncData: () => void;
+    template: [string];
 }
 
-const Modal = ({ isOpen, closeModal, addData }) => {
-    const [formData, setFormData] = useState({ new_key: '', new_value: '' });
+const AddModal = ({ isOpen, closeModal, syncData, template}) => {
+    const [keyData, setKeyData] = useState('');
+    const [values, setValues] = useState({});
+
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setFormData({ ...formData, [name]: value });
+
+        if (name === 'new_key') {
+            setKeyData(value);
+            return;
+        }
+
+        setValues(prevValues => {
+            return {
+                ...prevValues,
+                [name]: value
+            }
+        })
     };
 
-    const sendFormData = async (data: { new_key: string; new_value: string }) => {
+    const sendFormData = async (data: { new_key: string; new_values: object }) => {
         console.log(JSON.stringify(data));
-        const response = await fetch(`api/create_key?new_key=${data.new_key}&new_value=${data.new_value}`, {
+        // TODO: encode values
+        const response = await fetch(`api/create_key?new_key=${data.new_key}&new_value=${data.new_values}`, {
             method: 'POST'
-        }).then((response) => {
+        })
+        .then((response) => {
             if (response.ok) {
                 return response.json();
             }
             throw new Error('Network response was not ok');
         })
-            .then((responseJson) => {
-                addData(data.new_key, data.new_value);
-                // Do something with the response
-            })
-            .catch((error) => {
-                console.log(error)
-            });
+        .then((responseJson) => {
+            syncData(data.new_key);
+        })
+        .catch((error) => {
+            console.log(error)
+        });
 
     };
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        sendFormData(formData);
+        sendFormData({new_key: keyData, new_values: values});
         closeModal();
     };
 
@@ -54,24 +69,27 @@ const Modal = ({ isOpen, closeModal, addData }) => {
                                 <input
                                     type="text"
                                     name="new_key"
-                                    value={formData.new_key}
+                                    root-key={true}
                                     onChange={handleChange}
                                     className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                     placeholder="Key"
                                     required
                                 />
                             </div>
-                            <div className="mt-2">
-                                <input
-                                    type="text"
-                                    name="new_value"
-                                    value={formData.new_value}
-                                    onChange={handleChange}
-                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                    placeholder="Value"
-                                    required
-                                />
-                            </div>
+                            {
+                                template.map((value) => (
+                                    <div className="mt-2" key={value}>
+                                        <input
+                                            type="text"
+                                            name={value}
+                                            onChange={handleChange}
+                                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                            placeholder={value}
+                                            required
+                                        />
+                                    </div>
+                                ))
+                            }
                             <div className="mt-5 sm:mt-6">
                                 <button
                                     type="submit"
@@ -88,4 +106,4 @@ const Modal = ({ isOpen, closeModal, addData }) => {
     );
 };
 
-export default Modal
+export default AddModal

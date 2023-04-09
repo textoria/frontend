@@ -1,6 +1,6 @@
 import getConfig from 'next/config';
 import {useEffect, useState} from "react";
-import Modal from '../components/modal';
+import AddModal from '../components/addModal';
 import RemoveModal from "../components/removeModal";
 
 const { publicRuntimeConfig } = getConfig();
@@ -16,13 +16,53 @@ export default function Home({dataJson}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [removedKey, setRemovedKey] = useState('');
-  const [data, setData] = useState<JsonDataInterface>(dataJson);
+  // const [data, setData] = useState<JsonDataInterface>(dataJson);
   const [elementInFocus, setElementInFocus] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState({
+    "weekly_report_button": {
+      "en": "📊 Reports",
+      "ru": "📊 Статистика"
+    },
+    "weekly_report_locked_button": {
+      "en": "🔒 Reports",
+      "ru": "🔒 Статистика"
+    },
+    "what_is_alisa_button": {
+      "en": "ℹ️ Who is Alice?",
+      "ru": "ℹ️ Что такое Алиса?"
+    },
+    "whats_next_button": {
+      "en": "😲 Ok, what to do after?",
+      "ru": "😲 Ого, а что дальше?"
+    },
+    "wisdom_setting_disabled_button": {
+      "en": "👁️ Show wisdoms",
+      "ru": "👁️ Показывать мудрости"
+    },
+    "wisdom_setting_enabled_button": {
+      "en": "🙈 Hide wisdoms",
+      "ru": "🙈 Скрыть мудрости"
+    },
+    "working_hours_button": {
+      "en": "📆 Working schedule",
+      "ru": "📆 Рабочий график"
+    },
+    "write_me_button": {
+      "en": "🤝 Yes, write to me",
+      "ru": "🤝 Да, напиши мне"
+    },
+    "yes_button": {
+      "en": "✅ Yes",
+      "ru": "✅ Да"
+    }
+  });
+
 
   useEffect(() => {
     scrollToElement(elementInFocus);
   },[elementInFocus]);
-  const addData = async (key: string, newValue: string) => {
+  const syncData = async (key: string) => {
     const res = await fetch(`api/get_all_keys`);
     const dataJson = await res.json();
     console.log(dataJson);
@@ -55,11 +95,13 @@ export default function Home({dataJson}) {
         'sm:text-sm',
         'sm:leading-6'
     );
+    textareaElement.setAttribute('id', key);
 
     textareaElement.addEventListener('blur', () => {
       const newSpanElement = document.createElement('p');
       newSpanElement.innerText = textareaElement.value;
       newSpanElement.classList.add('text-sm', 'text-gray-500');
+      newSpanElement.setAttribute('id', key);
       newSpanElement.addEventListener('click', (e) => toggleEdit(e, key, textareaElement.value));
       textareaElement.replaceWith(newSpanElement);
       handleInputChange({ target: textareaElement });
@@ -73,26 +115,38 @@ export default function Home({dataJson}) {
 
   const handleInputChange = async (event) => {
     const inputElement = event.target;
+    const [key, language, ...rest] = inputElement.getAttribute('id').split('/');
     const oldValue = inputElement.getAttribute('data-prev-value'); // Get the previous value
     const newValue = inputElement.value;
 
     if (newValue !== oldValue) {
       inputElement.setAttribute('data-prev-value', newValue);
       console.log("update");
-      const res = await fetch(`api/update_key?key=${inputElement.id}&new_value=${encodeURIComponent(newValue)}`, {
-        method: 'PUT'
-      }).then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error('Something went wrong');
-      })
-          .then((responseJson) => {
-            // Do something with the response
-          })
-          .catch((error) => {
-            console.log(error)
-          });
+      console.log(key, language);
+      // const res = await fetch(`api/update_key?key=${inputElement.id}&new_value=${encodeURIComponent(newValue)}`, {
+      //   method: 'PUT'
+      // })
+      //   .then((response) => {
+      //     if (response.ok) {
+      //       return response.json();
+      //     }
+      //     throw new Error('Something went wrong');
+      //   })
+      //   .then((responseJson) => {
+      //     // Do something with the response
+      //   })
+      //   .catch((error) => {
+      //     console.log(error)
+      //   });
+      setData(prevData => {
+        return {
+          ...prevData,
+          [key]: {
+            ...prevData[key],
+            [language]: "📈 Reports"
+          }
+        };
+      });
     }
 
   };
@@ -115,6 +169,8 @@ export default function Home({dataJson}) {
 
   };
 
+  const templateValues = Object.keys(data[Object.keys(data)[0]]);
+
   return (
       <div className="px-4 sm:px-6 lg:px-8 sm:pt-6">
           <div className="sm:flex sm:items-center">
@@ -130,7 +186,7 @@ export default function Home({dataJson}) {
               >
                 Add key
               </button>
-              <Modal isOpen={isModalOpen} closeModal={closeModal} addData={addData} />
+              <AddModal isOpen={isModalOpen} closeModal={closeModal} syncData={syncData} template={templateValues}/>
             </div>
           </div>
           <div className="mt-8 flow-root">
@@ -138,36 +194,64 @@ export default function Home({dataJson}) {
               <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead>
+
                   <tr className="divide-x divide-gray-200">
                     <th scope="col" className="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">
                       Key
                     </th>
-                    <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Value
-                    </th>
+                    {
+                      Object.entries(data[Object.keys(data)[0]]).map(([key, value]) => (
+                        <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-gray-900" key={key}>
+                          {key}
+                        </th>
+                      ))
+                    }
                   </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                  {Object.entries(data).map(([key, fieldValue]) => (
-                      <tr key={key} id={key} className="divide-x divide-gray-200">
-                        <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-mono text-gray-900 sm:pl-0">
-                          {key}
-                        </td>
-                        <td className="p-4 text-sm text-gray-500">
-                          <p className="text-sm text-gray-500" onClick={(e) => toggleEdit(e, key, fieldValue)}>
-                          {fieldValue}
-                        </p>
-                        </td>
-                        <td className='relative whitespace-nowrap py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8'>
-                          <a href="#" className="text-red-600 hover:text-red-900" data-key={key} onClick={() => {
-                            setIsRemoveModalOpen(true);
-                            setRemovedKey(key);
-                          }}>
-                            Remove
-                          </a>
-                        </td>
-                      </tr>
-                  ))}
+                  <tbody className='divide-y divide-gray-200 bg-white'>
+                  {isLoading ? (
+                      Array.from({ length: 10 }).map((_, index) => (
+                          <tr key={index} className="divide-x divide-gray-200">
+                            <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-mono text-gray-900 sm:pl-0 blur opacity-50">
+                              Loading...
+                            </td>
+                            <td className="p-4 text-sm text-gray-500 blur opacity-50">
+                              <p className="text-sm text-gray-500">Loading...</p>
+                            </td>
+                            <td className='relative py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8 blur opacity-50 whitespace-nowrap'>
+                              <a href="#" className="text-red-600 hover:text-red-900">
+                                Loading...
+                              </a>
+                            </td>
+                          </tr>
+                      ))
+                  ) : (
+                      Object.entries(data).map(([key, value]) => (
+                          <tr key={key} id={key} className="divide-x divide-gray-200">
+                            <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-mono text-gray-900 sm:pl-0">
+                              {key}
+                            </td>
+                            {
+                              Object.entries(value).map(([translateKey, translateValue]) => (
+                                <td className="p-4 text-sm text-gray-500" key={`${key}/${translateKey}`}>
+                                  <p className="text-sm text-gray-500" id={`${key}/${translateKey}`} onClick={(e) => toggleEdit(e, `${key}/${translateKey}`, translateValue)}>
+                                    {translateValue}
+                                  </p>
+                                </td>
+                              ))
+                            }
+                            <td className='relative whitespace-nowrap py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8'>
+                              <a href="#" className="text-red-600 hover:text-red-900" onClick={() => {
+                                setIsRemoveModalOpen(true);
+                                setRemovedKey(key);
+                              }}>
+                                Remove
+                              </a>
+                            </td>
+                          </tr>
+                          )
+                      )
+                    )}
 
                   </tbody>
                 </table>
