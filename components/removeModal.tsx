@@ -13,8 +13,8 @@ const { publicRuntimeConfig } = getConfig();
 
 const API_BASE_URL = publicRuntimeConfig.API_BASE_URL;
 
-export default function RemoveModal({isOpen, closeModal, removedKey}) {
-    const removeKey = async (key) => {
+const RemoveModal = ({isOpen, closeModal, removedKey}) => {
+    const removeKey = async () => {
         const res = await fetch(`api/delete_key?key=${removedKey}`, {
             method: 'DELETE',
             headers:{
@@ -34,9 +34,9 @@ export default function RemoveModal({isOpen, closeModal, removedKey}) {
             });
     }
 
-    const handleRemove = (key) => {
-        removeKey(key);
-        document.getElementById(key).remove();
+    const handleRemove = () => {
+        removeKey();
+        document.getElementById(removedKey).remove();
         closeModal();
     }
     return (
@@ -85,7 +85,7 @@ export default function RemoveModal({isOpen, closeModal, removedKey}) {
                                     <button
                                         type="button"
                                         className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
-                                        onClick={() => handleRemove(removedKey)}
+                                        onClick={handleRemove}
                                     >
                                         Delete
                                     </button>
@@ -105,3 +105,5 @@ export default function RemoveModal({isOpen, closeModal, removedKey}) {
         </Transition.Root>
     )
 }
+
+export default RemoveModal;
