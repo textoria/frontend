@@ -52,7 +52,7 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
     const sendFormData = async (data: { new_key: string; new_values: object }) => {
         console.log(JSON.stringify(data.new_values));
         const response = await fetch(
-            `api/create_key?new_key=${encodeURIComponent(data.new_key)}`, {
+            `api/create_key?new_key=${encodeURI(data.new_key)}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

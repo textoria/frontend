@@ -206,13 +206,13 @@ export default function Home({dataJson}) {
     if (rest.length !== 0) {
       updatedValue = JSON.stringify(modifyObjectValue({...data[key][language]}, rest, inputElement.value));
     } else {
-      updatedValue = JSON.stringify(inputElement.value);
+      updatedValue = encodeURI(inputElement.value);
     }
 
     if (JSON.stringify(inputElement.value) !== oldValue) {
       inputElement.setAttribute('data-prev-value', JSON.stringify(inputElement.value));
       console.log("update");
-      const res = await fetch(`api/update_key?key=${key}&new_value=${updatedValue}&language=${language}`, {
+      const res = await fetch(`api/update_key?key=${encodeURI(key)}&new_value=${updatedValue}&language=${encodeURI(language)}`, {
         method: 'PUT'
       })
         .then((response) => {
