@@ -1,8 +1,8 @@
 import getConfig from 'next/config';
 import React from 'react';
 import {useEffect, useState} from "react";
-import ReactDOM from "react-dom";
-import {createRoot} from "react-dom/client";
+// import ReactDOM from "react-dom";
+// import {createRoot} from "react-dom/client";
 
 import AddModal from '../components/addModal';
 import RemoveModal from "../components/removeModal";
@@ -278,8 +278,8 @@ export default function Home({dataJson}) {
                     <th scope="col" className="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">
                       Key
                     </th>
-                    {
-                      Object.entries(data[Object.keys(data)[0]]).map(([key, value]) => (
+                    {// hardcode reverse
+                      Object.entries(data[Object.keys(data)[0]]).reverse().map(([key, value]) => (
                         <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-gray-900" key={key}>
                           {key}
                         </th>
@@ -310,8 +310,8 @@ export default function Home({dataJson}) {
                             <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-mono text-gray-900 sm:pl-0">
                               {key}
                             </td>
-                            {
-                              Object.entries(value).map(([translateKey, translateValue]) => (
+                            {// reverse hardcode
+                              Object.entries(value).reverse().map(([translateKey, translateValue]) => (
                                 <td className="p-4 text-sm text-gray-500" key={`${key}/${translateKey}`}>
                                   {typeof translateValue === 'object' ? (
                                       Object.entries(translateValue).map(([genderKey, genderValue]) => (

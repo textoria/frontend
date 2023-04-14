@@ -90,6 +90,8 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
 
     if (!isOpen) return null;
 
+    template.reverse().map((value)=> console.log(value));
+
     return (
         <div className="fixed z-10 inset-0 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
@@ -121,50 +123,56 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
                             {currentForm === 'neutral' ? (
                                 <>
                                     {
-                                        template.map((value) => (
-                                            <div className="mt-2" key={value}>
-                                                <input
-                                                    type="text"
-                                                    name={value}
-                                                    onChange={handleNeutralFormChange}
-                                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                    placeholder={value}
-                                                    required
-                                                />
-                                            </div>
-                                        ))
+                                        template.map((_, index) => {
+                                            const value = template[template.length - 1 - index];
+                                            return (
+                                                <div className="mt-2" key={value}>
+                                                    <input
+                                                        type="text"
+                                                        name={value}
+                                                        onChange={handleNeutralFormChange}
+                                                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                                        placeholder={value}
+                                                        required
+                                                    />
+                                                </div>
+                                            )
+                                        })
                                     }
                                 </>
                             ) : (
                                 <>
                                     {
-                                        template.map((value) => (
-                                            <React.Fragment key={value}>
-                                                <h4 className="text-lg leading-6 font-medium text-gray-900">{value}</h4>
-                                                <div className="mt-2" key={value}>
-                                                    <input
-                                                        type="text"
-                                                        name={value+'/female'}
-                                                        onChange={handleGenderFormChange}
-                                                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                        placeholder={'female'}
-                                                        required
-                                                    />
-                                                </div>
-                                                <div className="mt-2">
-                                                    <input
-                                                        type="text"
-                                                        name={value+'/male'}
-                                                        onChange={handleGenderFormChange}
-                                                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                        placeholder={'male'}
-                                                        required
-                                                    />
-                                                </div>
-                                            </React.Fragment>
+                                        template.map((_, index) => {
+                                            const value = template[template.length - 1 - index]
+                                            return (
+                                                <React.Fragment key={value}>
+                                                    <h4 className="text-lg leading-6 font-medium text-gray-900">{value}</h4>
+                                                    <div className="mt-2" key={value}>
+                                                        <input
+                                                            type="text"
+                                                            name={value+'/female'}
+                                                            onChange={handleGenderFormChange}
+                                                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                                            placeholder={'female'}
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div className="mt-2">
+                                                        <input
+                                                            type="text"
+                                                            name={value+'/male'}
+                                                            onChange={handleGenderFormChange}
+                                                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                                            placeholder={'male'}
+                                                            required
+                                                        />
+                                                    </div>
+                                                </React.Fragment>
 
 
-                                        ))
+                                            )
+                                        })
                                     }
                                 </>
                             )}
