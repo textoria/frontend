@@ -158,111 +158,111 @@ export default function Home({dataJson}) {
   console.log(error);
   return (
       <div className="px-4 sm:px-6 lg:px-8 sm:pt-6">
-          <div className="sm:flex sm:items-center">
-            <div className="sm:flex-auto">
-              <p className="mt-2 text-sm text-gray-700">
-                TEXTORIA
-              </p>
-            </div>
-            <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-              <button
-                  className="bg-indigo-600 text-white font-bold py-2 px-4 rounded"
-                  onClick={() => setIsModalOpen(true)}
-              >
-                Add key
-              </button>
-              <AddModal isOpen={isModalOpen} closeModal={closeModal} syncData={syncData} template={templateValues}/>
-            </div>
+        <header className="fixed top-0 left-0 px-3 w-full h-16 bg-indigo-300 opacity-80 flex justify-center items-center">
+          <div className="sm:flex-auto">
+            <p className="mt-2 text-sm text-gray-700">
+              TEXTORIA
+            </p>
           </div>
-          <div className="mt-8 flow-root">
-            <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                <table className="min-w-full divide-y divide-gray-300">
-                  <thead>
+          <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+            <button
+                className="bg-indigo-600 text-white font-bold py-2 px-4 rounded"
+                onClick={() => setIsModalOpen(true)}
+            >
+              Add key
+            </button>
+            <AddModal isOpen={isModalOpen} closeModal={closeModal} syncData={syncData} template={templateValues}/>
+          </div>
+        </header>
+        <div className="mt-10 flow-root">
+          <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div className="inline-block min-w-full py-2 align-middle">
+              <table className="min-w-full divide-y divide-gray-300">
+                <thead>
 
-                  <tr className="divide-x divide-gray-200">
-                    <th scope="col" className="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">
-                      Key
-                    </th>
-                    {// hardcode reverse
-                      Object.entries(data[Object.keys(data)[0]]).reverse().map(([key, value]) => (
-                        <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-gray-900" key={key}>
-                          {key}
-                        </th>
-                      ))
-                    }
-                  </tr>
-                  </thead>
-                  <tbody className='divide-y divide-gray-200 bg-white'>
-                  {isLoading ? (
-                      Array.from({ length: 10 }).map((_, index) => (
-                          <tr key={index} className="divide-x divide-gray-200">
-                            <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-mono text-gray-900 sm:pl-0 blur opacity-50">
+                <tr className="divide-x divide-gray-200">
+                  <th scope="col" className="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900">
+                    Key
+                  </th>
+                  {// hardcode reverse
+                    Object.entries(data[Object.keys(data)[0]]).reverse().map(([key, value]) => (
+                      <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold text-gray-900" key={key}>
+                        {key}
+                      </th>
+                    ))
+                  }
+                </tr>
+                </thead>
+                <tbody className='divide-y divide-gray-200 bg-white'>
+                {isLoading ? (
+                    Array.from({ length: 10 }).map((_, index) => (
+                        <tr key={index} className="divide-x divide-gray-200">
+                          <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-mono text-gray-900 sm:pl-0 blur opacity-50">
+                            Loading...
+                          </td>
+                          <td className="p-4 text-sm text-gray-500 blur opacity-50">
+                            <p className="text-sm text-gray-500">Loading...</p>
+                          </td>
+                          <td className='relative py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8 blur opacity-50 whitespace-nowrap'>
+                            <a href="#" className="text-red-600 hover:text-red-900">
                               Loading...
-                            </td>
-                            <td className="p-4 text-sm text-gray-500 blur opacity-50">
-                              <p className="text-sm text-gray-500">Loading...</p>
-                            </td>
-                            <td className='relative py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8 blur opacity-50 whitespace-nowrap'>
-                              <a href="#" className="text-red-600 hover:text-red-900">
-                                Loading...
-                              </a>
-                            </td>
-                          </tr>
-                      ))
-                  ) : (
-                      Object.entries(data).map(([key, value]) => (
-                          <tr key={key} id={key} className="divide-x divide-gray-200">
-                            <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-mono text-gray-900 sm:pl-0">
-                              {key}
-                            </td>
-                            {// reverse hardcode
-                              Object.entries(value).reverse().map(([translateKey, translateValue]) => (
-                                <td className="p-4 text-sm text-gray-500" key={`${key}/${translateKey}`}>
-                                  {typeof translateValue === 'object' ? (
-                                      Object.entries(translateValue).map(([genderKey, genderValue]) => (
-                                          <React.Fragment key={`${key}/${translateKey}/${genderKey}`}>
-                                            <span className='text-red-600'>{genderKey}</span>
-                                            <p className="text-sm text-gray-500 border border-gray-300 p-2 rounded cursor-pointer whitespace-pre-line min-height-line"
-                                               id={`${key}/${translateKey}/${genderKey}`}
-                                               onClick={(e) => toggleEdit(e, `${key}/${translateKey}/${genderKey}`, genderValue)}>
-                                            {genderValue}
-                                            </p>
-                                          </React.Fragment>
-                                      ))
-                                  ) : (
-                                      <p className="text-sm text-gray-500 border border-gray-300 p-2 rounded cursor-pointer whitespace-pre-line min-height-line"
-                                         id={`${key}/${translateKey}`}
-                                         onClick={(e) => toggleEdit(e, `${key}/${translateKey}`, translateValue)}>
-                                        {translateValue}
-                                      </p>
-                                  )}
+                            </a>
+                          </td>
+                        </tr>
+                    ))
+                ) : (
+                    Object.entries(data).map(([key, value]) => (
+                        <tr key={key} id={key} className="divide-x divide-gray-200">
+                          <td className="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-mono text-gray-900">
+                            {key}
+                          </td>
+                          {// reverse hardcode
+                            Object.entries(value).reverse().map(([translateKey, translateValue]) => (
+                              <td className="p-4 text-sm text-gray-500" key={`${key}/${translateKey}`}>
+                                {typeof translateValue === 'object' ? (
+                                    Object.entries(translateValue).map(([genderKey, genderValue]) => (
+                                        <React.Fragment key={`${key}/${translateKey}/${genderKey}`}>
+                                          <span className='text-red-600'>{genderKey}</span>
+                                          <p className="text-sm text-gray-500 border border-gray-300 p-2 rounded cursor-pointer whitespace-pre-line min-height-line"
+                                             id={`${key}/${translateKey}/${genderKey}`}
+                                             onClick={(e) => toggleEdit(e, `${key}/${translateKey}/${genderKey}`, genderValue)}>
+                                          {genderValue}
+                                          </p>
+                                        </React.Fragment>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-gray-500 border border-gray-300 p-2 rounded cursor-pointer whitespace-pre-line min-height-line"
+                                       id={`${key}/${translateKey}`}
+                                       onClick={(e) => toggleEdit(e, `${key}/${translateKey}`, translateValue)}>
+                                      {translateValue}
+                                    </p>
+                                )}
 
-                                </td>
-                              ))
-                            }
-                            <td className='relative whitespace-nowrap py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8'>
-                              <a href="#" className="text-red-600 hover:text-red-900" onClick={() => {
-                                setIsRemoveModalOpen(true);
-                                setRemovedKey(key);
-                              }}>
-                                Remove
-                              </a>
-                            </td>
-                          </tr>
-                          )
-                      )
-                    )}
+                              </td>
+                            ))
+                          }
+                          <td className='relative whitespace-nowrap py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8'>
+                            <a href="#" className="text-red-600 hover:text-red-900" onClick={() => {
+                              setIsRemoveModalOpen(true);
+                              setRemovedKey(key);
+                            }}>
+                              Remove
+                            </a>
+                          </td>
+                        </tr>
+                        )
+                    )
+                  )}
 
-                  </tbody>
-                </table>
-                <RemoveModal isOpen={isRemoveModalOpen} closeModal={closeRemoveModal} removedKey={removedKey}/>
-                <ScrollButton />
-                {error !== '' ? <Alert message={error}/>: ''}
+                </tbody>
+              </table>
+              <RemoveModal isOpen={isRemoveModalOpen} closeModal={closeRemoveModal} removedKey={removedKey}/>
+              <ScrollButton />
+              {error !== '' ? <Alert message={error}/>: ''}
 
-              </div>
             </div>
           </div>
+        </div>
         </div>
   );
 }
