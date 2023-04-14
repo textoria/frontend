@@ -1,13 +1,13 @@
 import getConfig from 'next/config';
 import React from 'react';
 import {useEffect, useState} from "react";
-// import ReactDOM from "react-dom";
-// import {createRoot} from "react-dom/client";
+import {createRoot} from "react-dom/client";
 
 import AddModal from '../components/addModal';
 import RemoveModal from "../components/removeModal";
-// import DivTextArea from "../components/divTextArea";
+import DivTextArea from "../components/divTextArea";
 import ScrollButton from "../components/scrollButton";
+import Alert from "../components/alert";
 
 
 const { publicRuntimeConfig } = getConfig();
@@ -20,9 +20,6 @@ interface JsonDataInterface {
   };
 }
 
-interface ObjectWithUnknownDepth {
-  [key: string]: any;
-}
 
 export default function Home({dataJson}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,7 +27,9 @@ export default function Home({dataJson}) {
   const [removedKey, setRemovedKey] = useState('');
   const [data, setData] = useState<JsonDataInterface>(dataJson);
   const [elementInFocus, setElementInFocus] = useState('');
+  // TODO create skeleton for loading state
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   // const [data, setData] = useState({
   //   "weekly_report_button": {
   //     "en": "📊 Reports",
@@ -73,162 +72,69 @@ export default function Home({dataJson}) {
 
   // console.log(dataJson);
 
-
   useEffect(() => {
     scrollToElement(elementInFocus);
   },[elementInFocus]);
+
+  useEffect(() => {
+  },[error]);
+
+
   const syncData = async (key: string) => {
     const res = await fetch(`api/get_all_keys`);
     const dataJson = await res.json();
 
     setData(dataJson);
     setElementInFocus(key);
-  }
 
+  }
 
   const toggleEdit = (event, key, fieldValue) => {
-    const spanElement = event.currentTarget;
-    const textareaElement = document.createElement('textarea');
-    textareaElement.setAttribute('data-prev-value', JSON.stringify(fieldValue));
-    textareaElement.setAttribute('name', key);
-    textareaElement.value = fieldValue;
-    textareaElement.classList.add(
-        'tracked-input',
-        'block',
-        'w-full',
-        'rounded-md',
-        // 'border',
-        // 'border-gray-300',
-        'py-1.5',
-        'px-2',
-        'text-sm',
-        'text-gray-900',
-        // 'shadow-sm',
-        // 'ring-1',
-        // 'ring-inset',
-        // 'ring-gray-300',
-        // 'placeholder-gray-400',
-        // 'focus:outline-none',
-        // 'focus:ring-2',
-        // 'focus:ring-inset',
-        // 'focus:ring-gray-600',
-        // 'outline-none'
-    );
-    textareaElement.setAttribute('id', key);
+    const staticTextWrapper = event.currentTarget;
+    const parentElement = staticTextWrapper.parentElement;
+    const actualParentElement = staticTextWrapper.parentNode;
 
-    textareaElement.addEventListener('blur', () => {
-      const newSpanElement = document.createElement('p');
-      newSpanElement.innerText = textareaElement.value;
-      newSpanElement.classList.add("text-sm", "text-gray-500", "border", "border-gray-300", "px-2", "py-1", "rounded", "cursor-pointer");
-      newSpanElement.setAttribute('id', key);
-      newSpanElement.addEventListener('click', (e) => toggleEdit(e, key, textareaElement.value));
-      textareaElement.replaceWith(newSpanElement);
-      handleInputChange({ target: textareaElement });
+
+    const handleBlur = (event) => {
+      const newStaticTextWrapper = React.createElement(
+          'p',
+          {
+            id: key,
+            className: 'text-sm text-gray-500 border border-gray-300 p-2 rounded cursor-pointer whitespace-pre-line min-height-line',
+            onClick: (e) => toggleEdit(e, key, event.target.textContent),
+          },
+          event.target.textContent
+      );
+
+      const existingRoot = rootMap.get(parentElement);
+      if (existingRoot) {
+        existingRoot.render(newStaticTextWrapper);
+      } else {
+        const newRoot = createRoot(parentElement);
+        rootMap.set(parentElement, newRoot);
+        newRoot.render(newStaticTextWrapper);
+      }
+
+    };
+
+    const dynamicTextWrapper = React.createElement(DivTextArea, {
+      value: fieldValue,
+      onBlur: handleBlur,
+      id: key,
+      data: data,
+      setError
     });
 
-    spanElement.replaceWith(textareaElement);
-
-    textareaElement.style.height = 'auto';
-    textareaElement.style.height = textareaElement.scrollHeight + 'px';
-    textareaElement.focus();
-
+    const existingRoot = rootMap.get(parentElement);
+    if (existingRoot) {
+      existingRoot.render(dynamicTextWrapper);
+    } else {
+      const newRoot = createRoot(parentElement);
+      rootMap.set(parentElement, newRoot);
+      newRoot.render(dynamicTextWrapper);
+    }
   };
 
-  // const toggleEdit = (event, key, fieldValue) => {
-  //   const staticTextWrapper = event.currentTarget;
-  //   const parentElement = staticTextWrapper.parentElement;
-  //
-  //   const handleBlur = () => {
-  //     const newStaticTextWrapper = React.createElement(
-  //         'p',
-  //         {
-  //           id: key,
-  //           className: 'text-sm text-gray-500 border border-gray-300 px-2 py-1 rounded cursor-pointer',
-  //           onClick: (e) => toggleEdit(e, key, dynamicTextWrapper.props.value),
-  //         },
-  //         dynamicTextWrapper.props.value
-  //     );
-  //
-  //     const existingRoot = rootMap.get(parentElement);
-  //     if (existingRoot) {
-  //       existingRoot.render(newStaticTextWrapper);
-  //     } else {
-  //       const newRoot = createRoot(parentElement);
-  //       rootMap.set(parentElement, newRoot);
-  //       newRoot.render(newStaticTextWrapper);
-  //     }
-  //   };
-  //
-  //   const dynamicTextWrapper = React.createElement(DivTextArea, {
-  //     value: fieldValue,
-  //     onBlur: handleBlur,
-  //   });
-  //
-  //   const existingRoot = rootMap.get(parentElement);
-  //   if (existingRoot) {
-  //     existingRoot.render(dynamicTextWrapper);
-  //   } else {
-  //     const newRoot = createRoot(parentElement);
-  //     rootMap.set(parentElement, newRoot);
-  //     newRoot.render(dynamicTextWrapper);
-  //   }
-  //
-  //   // Remove the staticTextWrapper from the parent element
-  //   parentElement.removeChild(staticTextWrapper);
-  // };
-
-  function modifyObjectValue(obj: ObjectWithUnknownDepth, keyPath: string[], value: any): ObjectWithUnknownDepth {
-    const [currentKey, ...restKeys] = keyPath;
-    if (!restKeys.length) {
-      return {
-        ...obj,
-        [currentKey]: value,
-      };
-    }
-
-    const currentObj = obj[currentKey];
-    if (!currentObj || typeof currentObj !== 'object') {
-      throw new Error(`Invalid key path: ${keyPath.join('/')}`);
-    }
-
-    const modifiedValue = modifyObjectValue(currentObj, restKeys, value);
-    return {
-      ...obj,
-      [currentKey]: modifiedValue,
-    };
-  }
-
-  const handleInputChange = async (event) => {
-    const inputElement = event.target;
-    const [key, language, ...rest] = inputElement.getAttribute('id').split('/');
-    const oldValue = inputElement.getAttribute('data-prev-value'); // Get the previous value
-    let updatedValue;
-    if (rest.length !== 0) {
-      updatedValue = JSON.stringify(modifyObjectValue({...data[key][language]}, rest, inputElement.value));
-    } else {
-      updatedValue = encodeURI(inputElement.value);
-    }
-
-    if (JSON.stringify(inputElement.value) !== oldValue) {
-      inputElement.setAttribute('data-prev-value', JSON.stringify(inputElement.value));
-      console.log("update");
-      const res = await fetch(`api/update_key?key=${encodeURI(key)}&new_value=${updatedValue}&language=${encodeURI(language)}`, {
-        method: 'PUT'
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          }
-          throw new Error('Something went wrong');
-        })
-        .then((responseJson) => {
-          // Do something with the response
-        })
-        .catch((error) => {
-          console.log(error)
-        });
-    }
-  }
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -249,7 +155,7 @@ export default function Home({dataJson}) {
   };
 
   const templateValues = Object.keys(data[Object.keys(data)[0]]);
-
+  console.log(error);
   return (
       <div className="px-4 sm:px-6 lg:px-8 sm:pt-6">
           <div className="sm:flex sm:items-center">
@@ -317,7 +223,7 @@ export default function Home({dataJson}) {
                                       Object.entries(translateValue).map(([genderKey, genderValue]) => (
                                           <React.Fragment key={`${key}/${translateKey}/${genderKey}`}>
                                             <span className='text-red-600'>{genderKey}</span>
-                                            <p className="text-sm text-gray-500 border border-gray-300 px-2 py-1 rounded cursor-pointer whitespace-pre-line"
+                                            <p className="text-sm text-gray-500 border border-gray-300 p-2 rounded cursor-pointer whitespace-pre-line min-height-line"
                                                id={`${key}/${translateKey}/${genderKey}`}
                                                onClick={(e) => toggleEdit(e, `${key}/${translateKey}/${genderKey}`, genderValue)}>
                                             {genderValue}
@@ -325,7 +231,7 @@ export default function Home({dataJson}) {
                                           </React.Fragment>
                                       ))
                                   ) : (
-                                      <p className="text-sm text-gray-500 border border-gray-300 px-2 py-1 rounded cursor-pointer whitespace-pre-line"
+                                      <p className="text-sm text-gray-500 border border-gray-300 p-2 rounded cursor-pointer whitespace-pre-line min-height-line"
                                          id={`${key}/${translateKey}`}
                                          onClick={(e) => toggleEdit(e, `${key}/${translateKey}`, translateValue)}>
                                         {translateValue}
@@ -352,6 +258,8 @@ export default function Home({dataJson}) {
                 </table>
                 <RemoveModal isOpen={isRemoveModalOpen} closeModal={closeRemoveModal} removedKey={removedKey}/>
                 <ScrollButton />
+                {error !== '' ? <Alert message={error}/>: ''}
+
               </div>
             </div>
           </div>

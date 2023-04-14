@@ -96,3 +96,7 @@ button {
 .scroll-button:active {
   transform: scale(0.9);
 }
+
+.min-height-line {
+  min-height: calc(1.5 * 0.875rem + 2 * 0.5rem + 2*1px);
+}
