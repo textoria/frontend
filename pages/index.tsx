@@ -158,7 +158,7 @@ export default function Home({dataJson}) {
   console.log(error);
   return (
       <div className="px-4 sm:px-6 lg:px-8 sm:pt-6">
-        <header className="fixed top-0 left-0 px-3 w-full h-16 bg-indigo-300 opacity-80 flex justify-center items-center">
+        <header className="fixed top-0 left-0 px-3 w-full h-16 bg-indigo-300 opacity-80 flex justify-center items-center z-5">
           <div className="sm:flex-auto">
             <p className="mt-2 text-sm text-gray-700">
               TEXTORIA
@@ -241,7 +241,7 @@ export default function Home({dataJson}) {
                               </td>
                             ))
                           }
-                          <td className='relative whitespace-nowrap py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8'>
+                          <td className='whitespace-nowrap py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8 z-1'>
                             <a href="#" className="text-red-600 hover:text-red-900" onClick={() => {
                               setIsRemoveModalOpen(true);
                               setRemovedKey(key);

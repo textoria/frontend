@@ -86,6 +86,12 @@ const DivTextArea = ({ value, onBlur, id, data, setError }) => {
         }
     }
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter' && event.metaKey) {
+            divRef.current.blur()
+        }
+    }
+
     const divOnBlur = (event) => {
         handleInputChange(event);
         onBlur(event);
@@ -97,6 +103,7 @@ const DivTextArea = ({ value, onBlur, id, data, setError }) => {
             contentEditable
             onBlur={divOnBlur}
             id={id}
+            onKeyDown={handleKeyDown}
             className="rounded p-2 resize-none min-height-line text-sm w-full border focus:outline-none focus:border-indigo-300 whitespace-pre-wrap"
             suppressContentEditableWarning={true}
         >
