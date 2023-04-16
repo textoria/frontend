@@ -1,10 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 
-interface ObjectWithUnknownDepth {
-    [key: string]: any;
-}
 
-const DivTextArea = ({ value, onBlur, id, data, setError }) => {
+const DivTextArea = ({ value, onBlur, id, data, setError, setValue }) => {
     const divRef = useRef(null);
 
     useEffect(() => {
@@ -12,7 +9,12 @@ const DivTextArea = ({ value, onBlur, id, data, setError }) => {
             divRef.current.focus();
             setEndOfContentEditable(divRef.current);
         }
+        window.addEventListener('mousedown', handleWindowClick);
+        return () => {
+            window.removeEventListener('mousedown', handleWindowClick);
+        }
     }, []);
+
 
     const setEndOfContentEditable = (element) => {
         let range, selection;
@@ -31,71 +33,70 @@ const DivTextArea = ({ value, onBlur, id, data, setError }) => {
         // }
     };
 
-    function modifyObjectValue(obj: ObjectWithUnknownDepth, keyPath: string[], value: any): ObjectWithUnknownDepth {
-        const [currentKey, ...restKeys] = keyPath;
-        if (!restKeys.length) {
-            return {
-                ...obj,
-                [currentKey]: value,
-            };
-        }
-
-        const currentObj = obj[currentKey];
-        if (!currentObj || typeof currentObj !== 'object') {
-            throw new Error(`Invalid key path: ${keyPath.join('/')}`);
-        }
-
-        const modifiedValue = modifyObjectValue(currentObj, restKeys, value);
-        return {
-            ...obj,
-            [currentKey]: modifiedValue,
-        };
-    }
-
-
     const handleInputChange = async (event) => {
         const inputElement = event.target;
-        const [key, language, ...rest] = inputElement.getAttribute('id').split('/');
-        const oldValue = inputElement.getAttribute('data-prev-value'); // Get the previous value
+        const [key, language, gender] = inputElement.getAttribute('id').split('/');
         let updatedValue;
-        if (rest.length !== 0) {
-            updatedValue = JSON.stringify(modifyObjectValue({...data[key][language]}, rest, inputElement.textContent));
+        let compareValue;
+        if (gender) {
+            updatedValue = {...data[key][language]};
+            updatedValue[gender] = inputElement.textContent;
+            compareValue = encodeURI(updatedValue[gender]);
+            updatedValue = JSON.stringify(updatedValue);
         } else {
-            updatedValue = encodeURI(inputElement.textContent);
+            updatedValue = inputElement.textContent;
+            compareValue = encodeURI(updatedValue);
         }
 
-        if (JSON.stringify(inputElement.textContent) !== oldValue) {
+        if (compareValue !== encodeURI(value)) {
             inputElement.setAttribute('data-prev-value', JSON.stringify(inputElement.textContent));
             console.log("update");
-            const res = await fetch(`api/update_key?key=${encodeURI(key)}&new_value=${updatedValue}&language=${encodeURI(language)}`, {
+
+            const res = await fetch(`api/update_key?key=${encodeURI(key)}&new_value=${encodeURI(updatedValue)}&language=${encodeURI(language)}`, {
                 method: 'PUT'
             })
                 .then((response) => {
-                    if (response.ok) {
-                        return response.json();
+                    if (!response.ok) {
+                        throw new Error('Something went wrong');
                     }
-                    throw new Error('Something went wrong');
                 })
                 .then((responseJson) => {
                     // Do something with the response
                 })
                 .catch((error) => {
                     console.log(error);
-                    setError(`key: ${key} ${error}`);
+                    setValue(value);
+                    setError(`${new Date().toLocaleTimeString()} key: ${key} ${error}`);
                 });
         }
     }
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter' && event.metaKey) {
-            divRef.current.blur()
+            divRef.current.blur();
         }
     }
+
+    const handleWindowClick = (event) => {
+
+        if (divRef.current && !divRef.current.contains(event.target)) {
+            divRef.current.blur();
+        } else if (divRef.current && divRef.current.contains(event.target)) {
+            event.stopPropagation();
+        }
+    };
 
     const divOnBlur = (event) => {
         handleInputChange(event);
         onBlur(event);
     }
+
+    const handleDivClick = (event) => {
+        event.stopPropagation();
+        if (divRef.current) {
+            divRef.current.focus();
+        }
+    };
 
     return (
         <div
@@ -104,8 +105,10 @@ const DivTextArea = ({ value, onBlur, id, data, setError }) => {
             onBlur={divOnBlur}
             id={id}
             onKeyDown={handleKeyDown}
-            className="rounded p-2 resize-none min-height-line text-sm w-full border focus:outline-none focus:border-indigo-300 whitespace-pre-wrap"
+            className="rounded p-2 resize-none min-height-line text-sm w-full
+             border focus:outline-none focus:border-indigo-300 break-all whitespace-pre-wrap"
             suppressContentEditableWarning={true}
+            onClick={handleDivClick}
         >
             {value}
         </div>

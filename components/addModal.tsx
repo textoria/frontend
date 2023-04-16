@@ -50,7 +50,6 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
 
 
     const sendFormData = async (data: { new_key: string; new_values: object }) => {
-        console.log(JSON.stringify(data.new_values));
         const response = await fetch(
             `api/create_key?new_key=${encodeURI(data.new_key)}`, {
                 method: 'POST',
@@ -89,9 +88,6 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
     };
 
     if (!isOpen) return null;
-
-    template.reverse().map((value)=> console.log(value));
-
     return (
         <div className="fixed z-10 inset-0 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">

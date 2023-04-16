@@ -1,6 +1,6 @@
-import { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import { ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import getConfig from 'next/config';
 
 interface RemoveModalProps {
@@ -10,8 +10,6 @@ interface RemoveModalProps {
 }
 
 const { publicRuntimeConfig } = getConfig();
-
-const API_BASE_URL = publicRuntimeConfig.API_BASE_URL;
 
 const RemoveModal = ({isOpen, closeModal, removedKey}) => {
     const removeKey = async () => {
