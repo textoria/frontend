@@ -1,7 +1,6 @@
-import { Fragment } from 'react';
+import {Fragment, useRef} from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import getConfig from 'next/config';
 
 interface RemoveModalProps {
     isOpen: boolean;
@@ -9,11 +8,12 @@ interface RemoveModalProps {
     removedKey: string;
 }
 
-const { publicRuntimeConfig } = getConfig();
 
-const RemoveModal = ({isOpen, closeModal, removedKey}) => {
-    const removeKey = async () => {
-        const res = await fetch(`api/delete_key?key=${removedKey}`, {
+const RemoveModal = ({isOpen, closeModal, removedKey, syncData}) => {
+    const modalRef = useRef(null);
+
+    const removeKey = async (key) => {
+        const res = await fetch(`api/delete_key?key=${key}`, {
             method: 'DELETE',
             headers:{
                 'Content-Type':'application/json'
@@ -25,7 +25,7 @@ const RemoveModal = ({isOpen, closeModal, removedKey}) => {
             throw new Error('Something went wrong');
         })
             .then((responseJson) => {
-                // Do something with the response
+                syncData();
             })
             .catch((error) => {
                 console.log(error)
@@ -33,10 +33,11 @@ const RemoveModal = ({isOpen, closeModal, removedKey}) => {
     }
 
     const handleRemove = () => {
-        removeKey();
-        document.getElementById(removedKey).remove();
+        removeKey(removedKey);
         closeModal();
     }
+
+
     return (
         <Transition.Root show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-10" onClose={closeModal}>

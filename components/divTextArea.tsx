@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 
 
-const DivTextArea = ({ value, onBlur, id, data, setError, setValue }) => {
+const DivTextArea = ({ value, onBlur, id, data, setError, setValue, syncData }) => {
     const divRef = useRef(null);
 
     useEffect(() => {
@@ -61,7 +61,7 @@ const DivTextArea = ({ value, onBlur, id, data, setError, setValue }) => {
                     }
                 })
                 .then((responseJson) => {
-                    // Do something with the response
+                    syncData();
                 })
                 .catch((error) => {
                     console.log(error);

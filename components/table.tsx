@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import {EllipsisVerticalIcon} from "@heroicons/react/24/solid";
 
 import Cell from "./cell";
 import RemoveModal from "./removeModal";
 import ScrollButton from "./scrollButton";
+import EditModal from "../components/editModal";
+
 
 
 const createHeaders = (headers) => {
@@ -13,13 +16,15 @@ const createHeaders = (headers) => {
 }
 
 
-const Table = ({ headings, minCellWidth, data, setError }) => {
+const Table = ({ headings, minCellWidth, data, setError, syncData }) => {
     const [activeIndex, setActiveIndex] = useState(null);
     const columns = createHeaders(headings);
     const [columnsWidth, setColumnsWidth] = useState([]);
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [removedKey, setRemovedKey] = useState('');
     const [frame, setFrame] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editData, setEditData] = useState({});
 
 
     const closeRemoveModal = () => {
@@ -97,6 +102,13 @@ const Table = ({ headings, minCellWidth, data, setError }) => {
             removeListeners();
         }
     }, [frame, activeIndex, mouseUp, removeListeners]);
+
+
+    const closeEditModal = () => {
+        setIsModalOpen(false);
+    }
+
+
     return (
         <div className={'w-full'}>
             <table className="resizeable-table min-w-full">
@@ -134,39 +146,58 @@ const Table = ({ headings, minCellWidth, data, setError }) => {
                                     <td className={`p-4 text-sm text-gray-500 border border-gray-300 relative ${columnsWidth.length ? '' : 'w-2/5'}`}
                                         key={`${key}/${translateKey}`}
                                     >
-                                        {typeof translateValue === 'object' ? (
-                                            Object.entries(translateValue).map(([genderKey, genderValue]) => (
-                                                <React.Fragment key={`${key}/${translateKey}/${genderKey}`}>
-                                                    <span className="text-red-600">{genderKey}</span>
-                                                    <div>
-                                                        <Cell
-                                                            id={`${key}/${translateKey}/${genderKey}`}
-                                                            value={genderValue}
-                                                            data={data}
-                                                            setError={setError}
-                                                        />
-                                                    </div>
 
-                                                </React.Fragment>
-                                            ))
-                                        ) : (
-                                            <Cell
-                                                id={`${key}/${translateKey}`}
-                                                value={translateValue}
-                                                data={data}
-                                                setError={setError}
-                                            />
-                                        )}
-                                        {translateKey === 'ru' ? (
-                                            <div
-                                                onMouseDown={() => mouseDown(1)}
-                                                className={`resizer min-h-full`}
+                                        <button
+                                            type="button"
+                                            className="rounded-full  p-1 text-white shadow-sm
+                                                                         focus-visible:outline focus-visible:outline-2
+                                                                         focus-visible:outline-offset-2 absolute top-0 right-0"
+                                            onClick={(event) => {
+                                                setIsModalOpen(true);
+                                                if (typeof translateValue === 'string') {
+                                                    setEditData({'key': key, 'language': translateKey, 'dataFields': {'default': translateValue}});
+                                                    return;
+                                                }
+                                                setEditData({'key': key, 'language': translateKey, 'dataFields': translateValue});
+                                            }}                                                        >
+                                            <EllipsisVerticalIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+                                        </button>
+                                        <div className={'pr-2 pt-3'}>
+                                            {typeof translateValue === 'object' ? (
+                                                Object.entries(translateValue).map(([genderKey, genderValue]) => (
+                                                    <React.Fragment key={`${key}/${translateKey}/${genderKey}`}>
+                                                        <span className="text-red-600">{genderKey}</span>
+                                                        <div>
+                                                            <Cell
+                                                                id={`${key}/${translateKey}/${genderKey}`}
+                                                                value={genderValue}
+                                                                data={data}
+                                                                setError={setError}
+                                                                syncData={syncData}
+                                                            />
+                                                        </div>
+
+                                                    </React.Fragment>
+                                                ))
+                                            ) : (
+                                                <Cell
+                                                    id={`${key}/${translateKey}`}
+                                                    value={translateValue}
+                                                    data={data}
+                                                    setError={setError}
+                                                    syncData={syncData}
                                                 />
-                                        ) : (
-                                            ''
-                                            )
-                                        }
-
+                                            )}
+                                            {translateKey === 'ru' ? (
+                                                <div
+                                                    onMouseDown={() => mouseDown(1)}
+                                                    className={`resizer min-h-full`}
+                                                    />
+                                            ) : (
+                                                ''
+                                                )
+                                            }
+                                        </div>
                                     </td>
 
                                 ))
@@ -184,7 +215,17 @@ const Table = ({ headings, minCellWidth, data, setError }) => {
                 )}
                 </tbody>
             </table>
-            <RemoveModal isOpen={isRemoveModalOpen} closeModal={closeRemoveModal} removedKey={removedKey}/>
+            {editData['dataFields'] && (
+                <EditModal isOpen={isModalOpen}
+                           closeModal={closeEditModal}
+                           dataFields={editData['dataFields']}
+                           language={editData['language']}
+                           pairKey={editData['key']}
+                           setError={setError}
+                           syncData={syncData}
+                />
+            )}
+            <RemoveModal isOpen={isRemoveModalOpen} closeModal={closeRemoveModal} removedKey={removedKey} syncData={syncData}/>
             <ScrollButton />
         </div>
     )

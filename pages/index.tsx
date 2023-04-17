@@ -1,11 +1,8 @@
 import getConfig from 'next/config';
-import React, {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState} from "react";
 
 import AddModal from '../components/addModal';
-import RemoveModal from "../components/removeModal";
-import ScrollButton from "../components/scrollButton";
 import Alert from "../components/alert";
-import Cell from "../components/cell";
 import Table from "../components/table";
 
 
@@ -31,7 +28,7 @@ export default function Home({dataJson}) {
 
   // const [data, setData] = useState({
   //   "weekly_report_button": {
-  //     "en": "📊 Reports",
+  //     "en": {"female": 'big', 'male': 'cat'},
   //     "ru": "📊 Статистика"
   //   },
   //   "weekly_report_locked_button": {
@@ -73,13 +70,12 @@ export default function Home({dataJson}) {
     scrollToElement(elementInFocus);
   },[elementInFocus]);
 
-  const syncData = async (key: string) => {
+  const syncData = async (key = '') => {
     const res = await fetch(`api/get_all_keys`);
     const dataJson = await res.json();
 
     setData(dataJson);
-    setElementInFocus(key);
-
+    if (key) setElementInFocus(key);
   }
 
   const closeModal = () => {
@@ -116,11 +112,11 @@ export default function Home({dataJson}) {
             </button>
           </div>
         </header>
-        <AddModal isOpen={isModalOpen} closeModal={closeModal} syncData={syncData} template={templateValues}/>
+        <AddModal isOpen={isModalOpen} closeModal={closeModal} syncData={syncData} template={['ru', 'en']}/>
         <div className="mt-10 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle">
-      <Table headings={['key', 'ru', 'en']} minCellWidth={150} data={data} setError={setError} />
+      <Table headings={['key', 'ru', 'en']} minCellWidth={150} data={data} setError={setError} syncData={syncData} />
               {error !== '' ? <Alert message={error}/>: ''}
 
             </div>

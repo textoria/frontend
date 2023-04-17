@@ -8,7 +8,7 @@ interface CellProps {
     setError: (error: string) => void;
 }
 
-const Cell = ({ id, value, data, setError }) => {
+const Cell = ({ id, value, data, setError, syncData }) => {
     const [editing, setEditing] = useState(false);
     const [currentValue, setCurrentValue] = useState(value);
 
@@ -30,6 +30,7 @@ const Cell = ({ id, value, data, setError }) => {
             data={data}
             setError={setError}
             setValue={setCurrentValue}
+            syncData={syncData}
         />
     ) : (
         <p
