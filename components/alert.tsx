@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-const Alert = ({ message, duration = 3000 }) => {
-    const [showAlert, setShowAlert] = useState(true);
+interface AlertProps {
+    message: string;
+    duration?: number;
+}
+
+const Alert: React.FC<AlertProps> = ({ message, duration = 3000 }) => {
+    const [showAlert, setShowAlert] = useState<boolean>(true);
 
     useEffect(() => {
         setShowAlert(true);

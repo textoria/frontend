@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import {XMarkIcon, PlusIcon} from "@heroicons/react/24/solid";
 
 interface ModalProps {
     isOpen: boolean;
     closeModal: () => void;
     syncData: () => void;
-    template: string[];
+    dataFields: { [key: string]: string };
+    pairKey: string;
+    language: string;
+    setError: (error: string) => void;
 }
 
-
-const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language, setError }) => {
-    const [newField, setNewField] = useState('');
-    const [fields, setFields] = useState(dataFields);
+const EditModal: React.FC<ModalProps> = ({ isOpen, closeModal, syncData, dataFields, pairKey, language, setError }) => {
+    const [newField, setNewField] = useState<string>('');
+    const [fields, setFields] = useState<{ [key: string]: string }>(dataFields);
 
     const [inputValues, setInputValues] = useState({});
 
@@ -23,11 +25,11 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
         }, {}));
     }, [dataFields]);
 
-    const handleAddField = (e) => {
+    const handleAddField = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation(); // Add this line to stop event propagation
         if (newField) {
-            setFields({...fields, [newField]: ''});
+            setFields({ ...fields, [newField]: '' });
             setInputValues((prevInputValues) => {
                 return { ...prevInputValues, [newField]: newField };
             });
@@ -40,9 +42,9 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
             setFields((prevFields) => {
                 const updatedFields = { ...prevFields };
                 delete updatedFields[keyToRemove];
-                return {'default': Object.values(updatedFields)[0]};
+                return { 'default': Object.values(updatedFields)[0] };
             });
-            setInputValues({'default': 'default'});
+            setInputValues({ 'default': 'default' });
             return;
         }
         setFields((prevFields) => {
@@ -58,14 +60,14 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
         });
     };
 
-    const handleChangeField = (event, key) => {
+    const handleChangeField = (event: React.ChangeEvent<HTMLInputElement>, key: string) => {
         setInputValues(prevInputValues => ({
             ...prevInputValues,
             [key]: event.target.value,
         }));
     };
 
-    const haveIdenticalKeysAndValues = (obj1, obj2) => {
+    const haveIdenticalKeysAndValues = (obj1: any, obj2: any) => {
         const keys1 = Object.keys(obj1);
         const keys2 = Object.keys(obj2);
 
@@ -82,8 +84,8 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
         return true;
     };
 
-    const sendFormData = async (fieldsValue, fieldsKeys, initFields) => {
-        let updatedFields = {};
+    const sendFormData = async (fieldsValue: any, fieldsKeys: any, initFields: any) => {
+        let updatedFields: any = {};
         Object.entries(fieldsValue).map(([key, value]) => {
             if (fieldsKeys[key]) updatedFields[fieldsKeys[key]] = value;
         })
@@ -96,7 +98,7 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
                 updatedFields = JSON.stringify(updatedFields);
             }
 
-            const res = await fetch(`api/update_key?key=${encodeURI(pairKey)}&new_value=${encodeURI(updatedFields)}&language=${encodeURI(language)}`, {
+            await fetch(`api/update_key?key=${encodeURI(pairKey)}&new_value=${encodeURI(updatedFields)}&language=${encodeURI(language)}`, {
                 method: 'PUT'
             })
                 .then((response) => {
@@ -104,7 +106,7 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
                         throw new Error('Something went wrong');
                     }
                 })
-                .then((responseJson) => {
+                .then(() => {
                     syncData();
                 })
                 .catch((error) => {
@@ -117,7 +119,7 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        sendFormData(fields, inputValues, dataFields);
+        sendFormData(fields, inputValues, dataFields).then();
         closeModal();
     };
 
@@ -137,7 +139,7 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
                         <form onSubmit={handleSubmit}>
                             {
                                 Object.keys(fields).length == 1 ? (
-                                    <React.Fragment key={language}>
+                                    <Fragment key={language}>
 
                                         <div className="mt-2 flex flex-row items-center">
                                             <input
@@ -148,11 +150,11 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
                                                 disabled
                                             />
                                         </div>
-                                    </React.Fragment>
+                                    </Fragment>
                                 ) : (
-                                    Object.entries(fields).map(([key, value]) => {
+                                    Object.entries(fields).map(([key, _]) => {
                                         return (
-                                            <React.Fragment key={key}>
+                                            <Fragment key={key}>
                                                 <div className="mt-2 flex flex-row items-center">
                                                     <input
                                                         type="text"
@@ -173,7 +175,7 @@ const EditModal = ({ isOpen, closeModal, syncData, dataFields, pairKey, language
                                                         <XMarkIcon className="h-4 w-4" aria-hidden="true" />
                                                     </button>
                                                 </div>
-                                            </React.Fragment>
+                                            </Fragment>
                                         )
                                     })
                                 )

@@ -1,5 +1,6 @@
+import { GetServerSideProps } from 'next';
 import getConfig from 'next/config';
-import React, {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 import AddModal from '../components/addModal';
 import Alert from "../components/alert";
@@ -16,8 +17,12 @@ interface JsonDataInterface {
   };
 }
 
+interface HomeProps {
+  dataJson: JsonDataInterface;
+}
 
-export default function Home({dataJson}) {
+
+const Home: React.FC<HomeProps> = ({dataJson}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState<JsonDataInterface>(dataJson);
   const [elementInFocus, setElementInFocus] = useState('');
@@ -44,11 +49,11 @@ export default function Home({dataJson}) {
   //     "ru": "😲 Ого, а что дальше?"
   //   },
   //   "wisdom_setting_disabled_button": {
-  //     "en": "👁️ Show wisdoms",
+  //     "en": "👁️ Show wisdom",
   //     "ru": "👁️ Показывать мудрости"
   //   },
   //   "wisdom_setting_enabled_button": {
-  //     "en": "🙈 Hide wisdoms",
+  //     "en": "🙈 Hide wisdom",
   //     "ru": "🙈 Скрыть мудрости"
   //   },
   //   "working_hours_button": {
@@ -80,10 +85,9 @@ export default function Home({dataJson}) {
 
   const closeModal = () => {
     setIsModalOpen(false);
-
   }
 
-  const scrollToElement = (elementId) => {
+  const scrollToElement = (elementId: string) => {
     const element = document.getElementById(elementId);
 
     if (element) {
@@ -116,7 +120,7 @@ export default function Home({dataJson}) {
         <div className="mt-10 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle">
-      <Table headings={['key', 'ru', 'en']} minCellWidth={150} data={data} setError={setError} syncData={syncData} />
+              <Table headings={['key', 'ru', 'en']} minCellWidth={150} data={data} setError={setError} syncData={syncData} />
               {error !== '' ? <Alert message={error}/>: ''}
 
             </div>
@@ -127,11 +131,13 @@ export default function Home({dataJson}) {
   );
 }
 
+export default Home;
 
-export async function getServerSideProps() {
+
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   const res = await fetch(`${API_BASE_URL}/get_all_keys`);
   const dataJson = await res.json();
 
-  return { props: { dataJson } }
-}
+  return { props: { dataJson } };
+};
 

@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import {ArrowLongUpIcon} from "@heroicons/react/20/solid";
 
 const ScrollToTopButton = () => {
-    const [showButton, setShowButton] = useState(false);
+    const [showButton, setShowButton] = useState<boolean>(false);
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.pageYOffset > 300) {
+            if (window.scrollY > 300) {
                 setShowButton(true);
             } else {
                 setShowButton(false);

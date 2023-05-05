@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, Fragment } from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/24/solid";
 
 import Cell from "./cell";
@@ -7,8 +7,15 @@ import ScrollButton from "./scrollButton";
 import EditModal from "../components/editModal";
 
 
+interface TableProps {
+    headings: string[];
+    minCellWidth: number;
+    data: { [key: string]: { [language: string]: { [gender: string]: string } | string } };
+    setError: (error: string) => void;
+    syncData: () => void;
+}
 
-const createHeaders = (headers) => {
+const createHeaders = (headers: string[]) => {
     return headers.map((item) => ({
         text: item,
         ref: useRef(),
@@ -16,7 +23,7 @@ const createHeaders = (headers) => {
 }
 
 
-const Table = ({ headings, minCellWidth, data, setError, syncData }) => {
+const Table: React.FC<TableProps> = ({ headings, minCellWidth, data, setError, syncData }) => {
     const [activeIndex, setActiveIndex] = useState(null);
     const columns = createHeaders(headings);
     const [columnsWidth, setColumnsWidth] = useState([]);
@@ -152,7 +159,7 @@ const Table = ({ headings, minCellWidth, data, setError, syncData }) => {
                                             className="rounded-full  p-1 text-white shadow-sm
                                                                          focus-visible:outline focus-visible:outline-2
                                                                          focus-visible:outline-offset-2 absolute top-0 right-0"
-                                            onClick={(event) => {
+                                            onClick={() => {
                                                 setIsModalOpen(true);
                                                 if (typeof translateValue === 'string') {
                                                     setEditData({'key': key, 'language': translateKey, 'dataFields': {'default': translateValue}});
@@ -165,7 +172,7 @@ const Table = ({ headings, minCellWidth, data, setError, syncData }) => {
                                         <div className={'pr-2 pt-3'}>
                                             {typeof translateValue === 'object' ? (
                                                 Object.entries(translateValue).map(([genderKey, genderValue]) => (
-                                                    <React.Fragment key={`${key}/${translateKey}/${genderKey}`}>
+                                                    <Fragment key={`${key}/${translateKey}/${genderKey}`}>
                                                         <span className="text-red-600">{genderKey}</span>
                                                         <div>
                                                             <Cell
@@ -177,7 +184,7 @@ const Table = ({ headings, minCellWidth, data, setError, syncData }) => {
                                                             />
                                                         </div>
 
-                                                    </React.Fragment>
+                                                    </Fragment>
                                                 ))
                                             ) : (
                                                 <Cell

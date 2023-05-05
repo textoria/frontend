@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import DivTextArea from "./divTextArea";
 
 interface CellProps {
@@ -6,21 +6,20 @@ interface CellProps {
     value: string;
     data: any;
     setError: (error: string) => void;
+    syncData: () => void;
 }
 
-const Cell = ({ id, value, data, setError, syncData }) => {
-    const [editing, setEditing] = useState(false);
-    const [currentValue, setCurrentValue] = useState(value);
-
-    const handleBlur = (event) => {
+const Cell: React.FC<CellProps> = ({ id, value, data, setError, syncData }) => {
+    const [editing, setEditing] = useState<boolean>(false);
+    const [currentValue, setCurrentValue] = useState<string>(value);
+    const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
         setEditing(false);
-        setCurrentValue(event.target.textContent);
+        setCurrentValue(event.target.textContent || "");
     };
 
     const handleClick = () => {
         setEditing(true);
     };
-
 
     return editing ? (
         <DivTextArea

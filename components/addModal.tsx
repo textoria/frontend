@@ -1,23 +1,40 @@
-import React, { useState } from 'react';
+import {useState, ChangeEvent, Fragment, MouseEvent} from 'react';
 import {XMarkIcon, PlusIcon} from "@heroicons/react/24/solid";
 
 interface ModalProps {
     isOpen: boolean;
     closeModal: () => void;
-    syncData: () => void;
+    syncData: (key: string) => void;
     template: string[];
 }
 
+interface Fields {
+    [key: string]: string[];
+}
 
-const AddModal = ({ isOpen, closeModal, syncData, template}) => {
+interface FormData {
+    [key: string]: string;
+}
+
+interface GenderFormData {
+    ru: {
+        [key: string]: string;
+    };
+    en: {
+        [key: string]: string;
+    };
+}
+
+
+const AddModal: React.FC<ModalProps> = ({ isOpen, closeModal, syncData, template}) => {
     const [keyData, setKeyData] = useState('');
-    const [neutralFormData, setNeutralFormData] = useState({ru: '', en: ''});
-    const [genderFormData, setGenderFormData] = useState({ru: {female: '', male: ''}, en: {female: '', male: ''}});
-    const [currentForm, setCurrentForm] = useState('neutral');
-    const [fields, setFields] = useState({'en': ['female', 'male'], 'ru': ['female', 'male']});
-    const [newFields, setNewFields] = useState({'en': '', 'ru': ''});
+    const [neutralFormData, setNeutralFormData] = useState<FormData>({ ru: '', en: '' });
+    const [genderFormData, setGenderFormData] = useState<GenderFormData>({ ru: { female: '', male: '' }, en: { female: '', male: '' } });
+    const [currentForm, setCurrentForm] = useState<'neutral' | 'gender'>('neutral');
+    const [fields, setFields] = useState<Fields>({ en: ['female', 'male'], ru: ['female', 'male'] });
+    const [newFields, setNewFields] = useState<FormData>({ en: '', ru: '' });
 
-    const handleAddField = (e, language) => {
+    const handleAddField = (e: MouseEvent, language: keyof FormData) => {
         e.preventDefault();
         if (newFields[language]) {
             setFields(prevState => {
@@ -33,7 +50,7 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
         }
     };
 
-    const removeField = (index: number, language) => {
+    const removeField = (index: number, language: keyof FormData) => {
         // console.log(fields);
         // console.log(genderFormData);
         if (fields[language].length === 2) {
@@ -71,11 +88,11 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
     };
 
 
-    const handleKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
         setKeyData(event.target.value);
     }
 
-    const handleNeutralFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNeutralFormChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
 
         setNeutralFormData(prevValues => {
@@ -85,7 +102,7 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
             }
         });
     };
-    const handleGenderFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleGenderFormChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
 
         const [language, gender] = name.split('/');
@@ -106,8 +123,7 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
 
 
     const sendFormData = async (data: { new_key: string; new_values: object }) => {
-        console.log(data.new_values);
-        const response = await fetch(
+        await fetch(
             `api/create_key?new_key=${encodeURI(data.new_key)}`, {
                 method: 'POST',
                 headers: {
@@ -121,7 +137,7 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
             }
             throw new Error('Network response was not ok');
         })
-        .then((responseJson) => {
+        .then(() => {
             syncData(data.new_key);
         })
         .catch((error) => {
@@ -154,10 +170,10 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (currentForm === 'neutral') {
-            sendFormData({new_key: keyData, new_values: neutralFormData});
+            sendFormData({new_key: keyData, new_values: neutralFormData}).then();
         } else {
             const preparedData = prepareData();
-            sendFormData({new_key: keyData, new_values: preparedData});
+            sendFormData({new_key: keyData, new_values: preparedData}).then();
         }
         resetForm();
         closeModal();
@@ -167,7 +183,11 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
     return (
         <div className="fixed z-10 inset-0 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-75" onClick={closeModal}></div>
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-75" onClick={() => {
+                    resetForm();
+                    closeModal();
+                    }
+                }></div>
                 <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden
                  shadow-xl transform sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                     <div>
@@ -205,7 +225,9 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
                                                         type="text"
                                                         name={value}
                                                         onChange={handleNeutralFormChange}
-                                                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                                        className="shadow-sm focus:ring-indigo-500
+                                                         focus:border-indigo-500 block w-full sm:text-sm
+                                                          border-gray-300 rounded-md"
                                                         placeholder={value}
                                                         value={neutralFormData[value]}
                                                         required
@@ -220,12 +242,12 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
                                     {
                                         template.map((language) => {
                                             return (
-                                                <React.Fragment key={language}>
+                                                <Fragment key={language}>
                                                     <h4 className="text-lg leading-6 font-medium text-purple-900 uppercase my-2">{language}</h4>
                                                     {
                                                         fields[language].length === 1 ? (
-                                                            fields[language].map((key, index) => (
-                                                                    <React.Fragment key={`${language}/${key}`}>
+                                                            fields[language].map((key, _) => (
+                                                                    <Fragment key={`${language}/${key}`}>
                                                                         <div className="mt-2 flex flex-row items-center" key={`${language}/${key}`}>
                                                                             <input
                                                                                 type="text"
@@ -239,12 +261,12 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
                                                                             />
                                                                         </div>
 
-                                                                    </React.Fragment>
+                                                                    </Fragment>
                                                                 )
                                                             )
                                                         ) : (
                                                             fields[language].map((key, index) => (
-                                                                    <React.Fragment key={`${language}/${key}`}>
+                                                                    <Fragment key={`${language}/${key}`}>
                                                                         <h6 className="text-lg leading-6 font-medium text-gray-900">{key}</h6>
 
                                                                         <div className="mt-2 flex flex-row items-center" key={`${language}/${key}`}>
@@ -269,7 +291,7 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
                                                                             </button>
                                                                         </div>
 
-                                                                    </React.Fragment>
+                                                                    </Fragment>
                                                                 )
                                                             )
 
@@ -280,7 +302,7 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
                                                                value={newFields[language]}
                                                                className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500
                                                                       block w-full sm:text-sm border-gray-300 rounded-md mr-2"
-                                                               onChange={(e) => setNewFields(prevState => {
+                                                               onChange={(e: ChangeEvent<HTMLInputElement>) => setNewFields(prevState => {
                                                                    const updatedNewFields = {...prevState};
                                                                    updatedNewFields[language] = e.target.value;
                                                                    return updatedNewFields;
@@ -291,11 +313,11 @@ const AddModal = ({ isOpen, closeModal, syncData, template}) => {
                                                             className="rounded-full bg-green-600 p-1 text-white shadow-sm
                                                                          hover:bg-green-500 focus-visible:outline focus-visible:outline-2
                                                                          focus-visible:outline-offset-2 focus-visible:outline-green-600"
-                                                            onClick={(event) => handleAddField(event, language)}                                                        >
+                                                            onClick={(event: MouseEvent) => handleAddField(event, language)}                                                        >
                                                             <PlusIcon className="h-4 w-4" aria-hidden="true" />
                                                         </button>
                                                     </div>
-                                                </React.Fragment>
+                                                </Fragment>
 
 
                                             )

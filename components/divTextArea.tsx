@@ -1,8 +1,17 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
+interface DivTextAreaProps {
+    value: string;
+    onBlur: (event: React.FocusEvent<HTMLDivElement>) => void;
+    id: string;
+    data: any;
+    setError: (error: string) => void;
+    setValue: (value: string) => void;
+    syncData: () => void;
+}
 
-const DivTextArea = ({ value, onBlur, id, data, setError, setValue, syncData }) => {
-    const divRef = useRef(null);
+const DivTextArea: React.FC<DivTextAreaProps> = ({ value, onBlur, id, data, setError, setValue, syncData }) => {
+    const divRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         if (divRef.current) {
@@ -15,36 +24,29 @@ const DivTextArea = ({ value, onBlur, id, data, setError, setValue, syncData }) 
         }
     }, []);
 
-
-    const setEndOfContentEditable = (element) => {
-        let range, selection;
-        // if (document.createRange) {
+    const setEndOfContentEditable = (element: HTMLElement) => {
+        let range: Range;
+        let selection: Selection;
         range = document.createRange();
         range.selectNodeContents(element);
         range.collapse(false);
-        selection = window.getSelection();
+        selection = window.getSelection()!;
         selection.removeAllRanges();
         selection.addRange(range);
-        // } else if (document.selection) { // IE fallback
-        //     range = document.body.createTextRange();
-        //     range.moveToElementText(element);
-        //     range.collapse(false);
-        //     range.select();
-        // }
     };
 
-    const handleInputChange = async (event) => {
-        const inputElement = event.target;
-        const [key, language, gender] = inputElement.getAttribute('id').split('/');
-        let updatedValue;
-        let compareValue;
+    const handleInputChange = async (event: React.SyntheticEvent<HTMLDivElement>) => {
+        const inputElement = event.target as HTMLDivElement;
+        const [key, language, gender] = inputElement.getAttribute('id')!.split('/');
+        let updatedValue: string | object;
+        let compareValue: string;
         if (gender) {
-            updatedValue = {...data[key][language]};
+            updatedValue = { ...data[key][language] };
             updatedValue[gender] = inputElement.textContent;
             compareValue = encodeURI(updatedValue[gender]);
             updatedValue = JSON.stringify(updatedValue);
         } else {
-            updatedValue = inputElement.textContent;
+            updatedValue = inputElement.textContent || "";
             compareValue = encodeURI(updatedValue);
         }
 
@@ -52,7 +54,7 @@ const DivTextArea = ({ value, onBlur, id, data, setError, setValue, syncData }) 
             inputElement.setAttribute('data-prev-value', JSON.stringify(inputElement.textContent));
             console.log("update");
 
-            const res = await fetch(`api/update_key?key=${encodeURI(key)}&new_value=${encodeURI(updatedValue)}&language=${encodeURI(language)}`, {
+            await fetch(`api/update_key?key=${encodeURI(key)}&new_value=${encodeURI(updatedValue)}&language=${encodeURI(language)}`, {
                 method: 'PUT'
             })
                 .then((response) => {
@@ -60,7 +62,7 @@ const DivTextArea = ({ value, onBlur, id, data, setError, setValue, syncData }) 
                         throw new Error('Something went wrong');
                     }
                 })
-                .then((responseJson) => {
+                .then(() => {
                     syncData();
                 })
                 .catch((error) => {
@@ -71,27 +73,27 @@ const DivTextArea = ({ value, onBlur, id, data, setError, setValue, syncData }) 
         }
     }
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter' && event.metaKey) {
-            divRef.current.blur();
+            divRef.current!.blur();
         }
     }
 
-    const handleWindowClick = (event) => {
+    const handleWindowClick = (event: MouseEvent) => {
 
-        if (divRef.current && !divRef.current.contains(event.target)) {
+        if (divRef.current && !divRef.current.contains(event.target as Node)) {
             divRef.current.blur();
-        } else if (divRef.current && divRef.current.contains(event.target)) {
+        } else if (divRef.current && divRef.current.contains(event.target as Node)) {
             event.stopPropagation();
         }
     };
 
-    const divOnBlur = (event) => {
-        handleInputChange(event);
+    const divOnBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+        handleInputChange(event).then();
         onBlur(event);
     }
 
-    const handleDivClick = (event) => {
+    const handleDivClick = (event: React.MouseEvent<HTMLDivElement>) => {
         event.stopPropagation();
         if (divRef.current) {
             divRef.current.focus();
@@ -105,7 +107,8 @@ const DivTextArea = ({ value, onBlur, id, data, setError, setValue, syncData }) 
             onBlur={divOnBlur}
             id={id}
             onKeyDown={handleKeyDown}
-            className="rounded p-2 resize-none min-height-line text-sm w-full
+            className="rounded p-2 resize-none min-height-line text-sm
+
              border focus:outline-none focus:border-indigo-300 break-all whitespace-pre-wrap"
             suppressContentEditableWarning={true}
             onClick={handleDivClick}
